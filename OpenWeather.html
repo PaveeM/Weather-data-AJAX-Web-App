@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Current Weather</title>
+  <style>
+    body 
+    {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      text-align: center;
+      padding: 50px;
+    }
+
+    .value-box 
+    {
+      display: inline-block;
+      padding: 20px;
+      margin-top: 20px;
+      border: 2px solid #007bff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: white;
+    }
+
+    .value-box p 
+    {
+      margin: 0;
+      font-size: 24px;
+      color: #333;
+    }
+
+    #bitcoin-value 
+    {
+      font-weight: bold;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+    <div class="value-box">
+        <p>Current Weather: <span id="weather-data"></span></p>
+    </div>
+    <script>
+        function updateWeatherData(data) 
+        {
+            // Update the <span> with the new value we get from the server
+            var span = document.querySelector("#weather-data");
+            span.innerHTML = data;
+
+            // Refresh the data every 30 minutes
+            var thirtyMinutes = 30 * 60 * 1000;
+            setTimeout(getCurrentWeather, thirtyMinutes);
+        }
+
+        function getCurrentWeather() 
+        {
+            var xhr = new XMLHttpRequest();
+            var url = "https://api.openweathermap.org/data/2.5/weather?q=Bangkok&appid=f253248498780b79f2b70a80cb5c5893&units=metric";
+
+            xhr.onload = function() 
+            {
+                if(this.status === 200) 
+                {
+                    var response = JSON.parse(this.responseText);
+                    var weatherDescription = response.weather[0].description;
+                    var temperature = response.main.temp;
+                    var weatherData = `${weatherDescription}, ${temperature}°C`;
+                    updateWeatherData(weatherData);
+                }
+            };
+
+            xhr.onerror = function() 
+            {
+                updateWeatherData("Error: Unable to get current weather data");
+            };
+
+            xhr.open("GET", url);
+            xhr.send();
+        }
+
+        window.onload = function() 
+        {
+            getCurrentWeather();
+        }
+    </script>
+</body>
+</html>
